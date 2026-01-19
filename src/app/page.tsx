@@ -69,14 +69,15 @@ export default function Home() {
       <div className="w-full max-w-2xl">
         
         {/* 1. 메인 제목 */}
-        <div className="text-center mb-8 sm:mb-12">
-          <h1 className="text-3xl sm:text-4xl font-bold text-primary mb-2">
-            오늘의 일기 쓰기
-          </h1>
-          <p className="text-gray-600 text-base sm:text-lg">
-            오늘 하루를 영어로 자유롭게 적어보세요
-          </p>
-        </div>
+        <header className="mb-12 text-center space-y-2">
+        <h1 className="text-4xl font-extrabold text-gray-800 tracking-tight">
+          {/* 기존: Daily English */}
+          하잉 <span className="text-primary">🍊</span> {/* ✨ 변경! 이모지는 선택 */}
+        </h1>
+        <p className="text-gray-500">
+          오늘 하루를 영어로 기록해보세요.
+        </p>
+      </header>
 
         {/* 2. 일기 입력 영역 */}
         <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-6">

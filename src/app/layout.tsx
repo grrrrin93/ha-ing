@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Daily English - 영어 일기 교정",
-  description: "의도를 유지한 채 세련된 영어 표현으로 업그레이드하는 일기 교정 서비스",
+  title: "하잉 - AI와 함께하는 영어 일기",
+  description: "매일 쓰는 영어 일기로 회화 연습까지!",
 };
 
 export default function RootLayout({

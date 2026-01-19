@@ -88,7 +88,8 @@ export default function DiaryList({ refreshFlag }: DiaryListProps) {
   return (
     <div className="w-full animate-[fadeIn_0.5s_ease-in-out]">
       <h2 className="text-2xl font-bold text-primary mb-6 text-center">
-        나의 영어 일기 📚
+        {/* 기존: 나의 영어 일기 📚 */}
+        하잉 📚 {/* ✨ 변경 */}
       </h2>
       
       <div className="space-y-4">
