@@ -10,16 +10,16 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: '#ffffff',
     theme_color: '#ffffff',
     icons: [
-      {
-        src: '/icon-192.png',
-        sizes: '192x192',
-        type: 'image/png',
-      },
-      {
-        src: '/icon-512.png',
-        sizes: '512x512',
-        type: 'image/png',
-      },
-    ],
+        {
+          src: '/icon-192.png?v=2',  // 👈 뒤에 ?v=2 를 붙였습니다!
+          sizes: '192x192',
+          type: 'image/png',
+        },
+        {
+          src: '/icon-512.png?v=2',  // 👈 여기도 ?v=2 추가!
+          sizes: '512x512',
+          type: 'image/png',
+        },
+      ],
   }
 }
