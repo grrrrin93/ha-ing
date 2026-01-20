@@ -2,13 +2,11 @@ import withPWA from "@ducanh2912/next-pwa";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // 기존 에러 무시 설정 (유지)
+  // 1. 타입스크립트 에러 무시 (유지)
   typescript: {
     ignoreBuildErrors: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  // 🚨 eslint 설정은 삭제했습니다! (이제 지원 안 함)
 };
 
 // PWA 설정
