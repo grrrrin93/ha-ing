@@ -1,3 +1,4 @@
+// src/components/DiaryList.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -8,34 +9,41 @@ import "moment/locale/ko"; // 한국어 설정
 // moment 한국어 설정 적용
 moment.locale("ko");
 
-// 데이터 타입 정의 (Supabase 테이블 컬럼과 일치해야 함)
+// 데이터 타입 정의
 interface Diary {
   id: number;
   original_text: string;
   formal_text: string;
   casual_text: string;
-  feedback: string; // 혹은 feedback_text (DB 컬럼명 확인 필요)
+  feedback: string;
   created_at: string;
-  status: string; // ✨ 상태 컬럼 추가됨
+  status: string;
+  author_id: string; // 닉네임 필드 (혹시 몰라 추가)
 }
 
+// ✨ Props에 userId(닉네임) 추가
 interface DiaryListProps {
-  refreshFlag: boolean;
+  refreshFlag?: boolean; // (선택사항으로 변경)
+  userId: string;        // 👈 필수: 누구의 일기인지 확인해야 함
 }
 
-export default function DiaryList({ refreshFlag }: DiaryListProps) {
+export default function DiaryList({ refreshFlag, userId }: DiaryListProps) {
   const [diaries, setDiaries] = useState<Diary[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
   // Supabase에서 일기 목록 가져오기
   const fetchDiaries = async () => {
+    // 닉네임이 없으면 아예 불러오지 않음 (보안)
+    if (!userId) return;
+
     try {
       setLoading(true);
       const { data, error } = await supabase
         .from("diaries")
         .select("*")
-        .eq("status", "active") // ✨ 핵심: 'active' 상태인 것만 가져오기 (삭제된 건 제외)
+        .eq("status", "active") // 삭제 안 된 것만
+        .eq("author_id", userId) // ✨ 핵심: 내 닉네임과 똑같은 글만 가져오기!
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -47,49 +55,48 @@ export default function DiaryList({ refreshFlag }: DiaryListProps) {
     }
   };
 
-  // ✨ 삭제 버튼 클릭 시 실행될 함수 (Soft Delete)
+  // 삭제 버튼 클릭 시 실행될 함수 (Soft Delete)
   const handleDelete = async (e: React.MouseEvent, id: number) => {
-    e.stopPropagation(); // 삭제 버튼 눌렀을 때 카드가 펼쳐지지 않게 막음
+    e.stopPropagation();
 
     if (!window.confirm("정말 이 일기를 삭제하시겠습니까? (휴지통으로 이동)")) {
       return;
     }
 
     try {
-      // DB에서 실제로 지우지 않고 상태만 'deleted'로 변경
       const { error } = await supabase
         .from("diaries")
         .update({ status: "deleted" })
-        .eq("id", id);
+        .eq("id", id)
+        .eq("author_id", userId); // ✨ 보안: 내 아이디와 일치할 때만 삭제 가능
 
       if (error) throw error;
 
-      // 성공하면 목록 새로고침 (화면에서 즉시 제거)
       alert("일기가 삭제되었습니다.");
-      fetchDiaries(); 
+      fetchDiaries(); // 목록 새로고침
 
     } catch (error) {
       console.error("삭제 실패:", error);
-      alert("삭제 중 오류가 발생했습니다. (권한 설정을 확인하세요)");
+      alert("삭제 중 오류가 발생했습니다.");
     }
   };
 
+  // refreshFlag나 userId가 바뀌면 다시 불러오기
   useEffect(() => {
     fetchDiaries();
-  }, [refreshFlag]);
+  }, [refreshFlag, userId]);
 
   const toggleExpand = (id: number) => {
     setExpandedId(expandedId === id ? null : id);
   };
 
-  if (loading) return <div className="text-center py-10 text-gray-400">일기장을 불러오는 중...</div>;
+  if (loading) return <div className="text-center py-10 text-gray-400">일기장을 불러오는 중... 🍊</div>;
   if (diaries.length === 0) return <div className="text-center py-10 text-gray-400">아직 작성된 일기가 없습니다.</div>;
 
   return (
     <div className="w-full animate-[fadeIn_0.5s_ease-in-out]">
       <h2 className="text-2xl font-bold text-primary mb-6 text-center">
-        {/* 기존: 나의 영어 일기 📚 */}
-        하잉 📚 {/* ✨ 변경 */}
+        하잉 기록장 📚
       </h2>
       
       <div className="space-y-4">
@@ -99,7 +106,7 @@ export default function DiaryList({ refreshFlag }: DiaryListProps) {
             className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:scale-[1.01] transition-transform cursor-pointer relative group"
             onClick={() => toggleExpand(diary.id)}
           >
-            {/* ✨ 삭제 버튼 (평소엔 숨겨져 있다가 마우스 올리면(group-hover) 나타남) */}
+            {/* 삭제 버튼 */}
             <button
               onClick={(e) => handleDelete(e, diary.id)}
               className="absolute top-4 right-4 z-10 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
